@@ -27,7 +27,7 @@ public class ClubeController {
 
     @GetMapping
     public ResponseEntity<List<ClubeResponseDTO>> listarClubes() {
-        List<ClubeResponseDTO> clubes = clubeService.listarTodos();
+        List<ClubeResponseDTO> clubes = clubeService.buscarTodos(); // Corrigido para buscarTodos()
         return ResponseEntity.ok(clubes);
     }
 
@@ -45,7 +45,7 @@ public class ClubeController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletarClube(@PathVariable Long id) {
-        clubeService.deletar(id);
+        clubeService.excluir(id); // Corrigido para excluir(id)
         return ResponseEntity.noContent().build();
     }
 }

@@ -27,7 +27,7 @@ public class ParticipacaoController {
 
     @GetMapping
     public ResponseEntity<List<ParticipacaoResponseDTO>> listarParticipacoes() {
-        List<ParticipacaoResponseDTO> participacoes = participacaoService.listarTodas();
+        List<ParticipacaoResponseDTO> participacoes = participacaoService.buscarTodos(); // Corrigido para buscarTodos()
         return ResponseEntity.ok(participacoes);
     }
 
@@ -39,7 +39,7 @@ public class ParticipacaoController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletarParticipacao(@PathVariable Long id) {
-        participacaoService.deletar(id);
+        participacaoService.excluir(id); // Corrigido para excluir(id)
         return ResponseEntity.noContent().build();
     }
 }

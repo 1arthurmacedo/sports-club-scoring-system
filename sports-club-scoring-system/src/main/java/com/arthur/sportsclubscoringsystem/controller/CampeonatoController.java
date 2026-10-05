@@ -27,7 +27,7 @@ public class CampeonatoController {
 
     @GetMapping
     public ResponseEntity<List<CampeonatoResponseDTO>> listarCampeonatos() {
-        List<CampeonatoResponseDTO> campeonatos = campeonatoService.listarTodos();
+        List<CampeonatoResponseDTO> campeonatos = campeonatoService.buscarTodos(); // Corrigido para buscarTodos()
         return ResponseEntity.ok(campeonatos);
     }
 
@@ -45,7 +45,7 @@ public class CampeonatoController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletarCampeonato(@PathVariable Long id) {
-        campeonatoService.deletar(id);
+        campeonatoService.excluir(id); // Corrigido para excluir(id)
         return ResponseEntity.noContent().build();
     }
 }

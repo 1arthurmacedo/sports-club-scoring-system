@@ -1,6 +1,5 @@
 package com.arthur.sportsclubscoringsystem.repository;
 
-
 import com.arthur.sportsclubscoringsystem.model.Clube;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -23,15 +22,15 @@ public class ClubeRepository {
 
     public List<Clube> buscarTodos() {
         return entityManager
-                .createQuery("SELECT c FROM clubes c", Clube.class)
+                .createQuery("SELECT c FROM Clube c", Clube.class) // Corrigido: 'Clube' em vez de 'clubes'
                 .getResultList();
     }
 
     public Clube buscarPorNome(String nome) {
-        try{
+        try {
             return entityManager
                     .createQuery(
-                            "SELECT c FROM clube c WHERE c.nome = :nome",
+                            "SELECT c FROM Clube c WHERE c.nome = :nome", // Corrigido: 'Clube' em vez de 'clube'
                             Clube.class
                     )
                     .setParameter("nome", nome)
@@ -42,15 +41,13 @@ public class ClubeRepository {
     }
 
     @Transactional
-    public void atualizar(Clube clube){ entityManager.merge(clube);}
+    public void atualizar(Clube clube){ entityManager.merge(clube); }
 
     @Transactional
     public void excluir(Long id) {
         Clube clube = buscarPorId(id);
-
         if (clube != null) {
             entityManager.remove(clube);
         }
     }
-
 }

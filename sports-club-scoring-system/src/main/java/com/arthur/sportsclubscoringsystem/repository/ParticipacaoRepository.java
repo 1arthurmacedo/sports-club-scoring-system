@@ -2,8 +2,6 @@ package com.arthur.sportsclubscoringsystem.repository;
 
 import com.arthur.sportsclubscoringsystem.enums.Posicao;
 import com.arthur.sportsclubscoringsystem.model.Participacao;
-import com.arthur.sportsclubscoringsystem.model.Clube;
-import com.arthur.sportsclubscoringsystem.model.Campeonato;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.springframework.stereotype.Repository;
@@ -25,15 +23,15 @@ public class ParticipacaoRepository {
 
     public List<Participacao> buscarTodos() {
         return entityManager
-                .createQuery("SELECT p FROM participacoes p", Participacao.class)
+                .createQuery("SELECT p FROM Participacao p", Participacao.class) // Corrigido: 'Participacao' em vez de 'participacoes'
                 .getResultList();
     }
 
     public Participacao buscarPorClubeECampeonato(Long clubeId, Long campeonatoId) {
-        try{
+        try {
             return entityManager
                     .createQuery(
-                            "SELECT p FROM participacoes p WHERE c.clube_id = :clubeId AND c.campeonato_id = :campeonatoId",
+                            "SELECT p FROM Participacao p WHERE p.clube.id = :clubeId AND p.campeonato.id = :campeonatoId", // Corrigido: 'Participacao' e relacionamentos Java 'p.clube.id' / 'p.campeonato.id'
                             Participacao.class
                     )
                     .setParameter("clubeId", clubeId)
@@ -45,10 +43,10 @@ public class ParticipacaoRepository {
     }
 
     public Participacao buscarPorCampeonatoEPosicao(Long campeonatoId, Posicao posicao) {
-        try{
+        try {
             return entityManager
                     .createQuery(
-                            "SELECT p FROM participacoes p WHERE p.campeonato_id = :campeonatoId AND p.posicao = :posicao",
+                            "SELECT p FROM Participacao p WHERE p.campeonato.id = :campeonatoId AND p.posicao = :posicao", // Corrigido: 'Participacao' e 'p.campeonato.id'
                             Participacao.class
                     )
                     .setParameter("posicao", posicao)
@@ -60,12 +58,11 @@ public class ParticipacaoRepository {
     }
 
     @Transactional
-    public void atualizar(Participacao participacao){ entityManager.merge(participacao);}
+    public void atualizar(Participacao participacao){ entityManager.merge(participacao); }
 
     @Transactional
     public void excluir(Long id) {
         Participacao participacao = buscarPorId(id);
-
         if (participacao != null) {
             entityManager.remove(participacao);
         }

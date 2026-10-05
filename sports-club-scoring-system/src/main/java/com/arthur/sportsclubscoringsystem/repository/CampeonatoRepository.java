@@ -1,6 +1,5 @@
 package com.arthur.sportsclubscoringsystem.repository;
 
-
 import com.arthur.sportsclubscoringsystem.model.Campeonato;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -23,16 +22,15 @@ public class CampeonatoRepository {
 
     public List<Campeonato> buscarTodos() {
         return entityManager
-                .createQuery("SELECT c FROM campeonatos c", Campeonato.class)
+                .createQuery("SELECT c FROM Campeonato c", Campeonato.class) // Corrigido: 'Campeonato' em vez de 'campeonatos'
                 .getResultList();
-
     }
 
     public Campeonato buscarPorNome(String nome) {
-        try{
+        try {
             return entityManager
                     .createQuery(
-                            "SELECT c FROM campeonatos c WHERE c.nome = :nome",
+                            "SELECT c FROM Campeonato c WHERE c.nome = :nome", // Corrigido: 'Campeonato' em vez de 'campeonatos'
                             Campeonato.class
                     )
                     .setParameter("nome", nome)
@@ -43,15 +41,13 @@ public class CampeonatoRepository {
     }
 
     @Transactional
-    public void atualizar(Campeonato campeonato){ entityManager.merge(campeonato);}
+    public void atualizar(Campeonato campeonato){ entityManager.merge(campeonato); }
 
     @Transactional
     public void excluir(Long id) {
         Campeonato campeonato = buscarPorId(id);
-
         if (campeonato != null) {
             entityManager.remove(campeonato);
         }
     }
-
 }
