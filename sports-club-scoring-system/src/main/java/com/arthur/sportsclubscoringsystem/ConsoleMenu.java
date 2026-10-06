@@ -172,10 +172,10 @@ public class ConsoleMenu implements CommandLineRunner {
             System.out.print("\nID do Clube a editar: ");
             Long id = Long.parseLong(scanner.nextLine());
 
-            System.out.print("Novo Nome do Clube: ");
+            System.out.print("Novo nome do Clube: ");
             String nome = scanner.nextLine();
 
-            System.out.print("Novo Nome do Dono: ");
+            System.out.print("Nome do novo Dono: ");
             String dono = scanner.nextLine();
 
             System.out.print("Nova Data de Fundação (dd/MM/yyyy): ");
@@ -214,7 +214,7 @@ public class ConsoleMenu implements CommandLineRunner {
             System.out.print("\nNome do Campeonato: ");
             String nome = scanner.nextLine();
 
-            System.out.println("Opções de Nível: ESTADUAL, NACIONAL, INTERNACIONAL");
+            System.out.println("Opções de Nível: ESTADUAL, NACIONAL, REGIONAL, INTERNACIONAL");
             System.out.print("Digite o Nível: ");
             String nivelStr = scanner.nextLine().toUpperCase();
             Nivel nivel = Nivel.valueOf(nivelStr);
@@ -258,7 +258,7 @@ public class ConsoleMenu implements CommandLineRunner {
             System.out.print("Novo Nome do Campeonato: ");
             String nome = scanner.nextLine();
 
-            System.out.println("Opções de Nível: ESTADUAL, NACIONAL, INTERNACIONAL");
+            System.out.println("Opções de Nível: ESTADUAL, NACIONAL, REGIONAL, INTERNACIONAL");
             System.out.print("Digite o Novo Nível: ");
             String nivelStr = scanner.nextLine().toUpperCase();
             Nivel nivel = Nivel.valueOf(nivelStr);
@@ -305,7 +305,7 @@ public class ConsoleMenu implements CommandLineRunner {
             System.out.print("ID do Campeonato: ");
             Long campeonatoId = Long.parseLong(scanner.nextLine());
 
-            System.out.println("Opções de Posição: PRIMEIRO, SEGUNDO, TERCEIRO, OUTRO");
+            System.out.println("Opções de Posição: PRIMEIRO, SEGUNDO ou TERCEIRO");
             System.out.print("Digite a Posição: ");
             String posicaoStr = scanner.nextLine().toUpperCase();
             Posicao posicao = Posicao.valueOf(posicaoStr);
@@ -348,7 +348,7 @@ public class ConsoleMenu implements CommandLineRunner {
             System.out.print("Novo ID do Campeonato: ");
             Long campeonatoId = Long.parseLong(scanner.nextLine());
 
-            System.out.println("Opções de Posição: PRIMEIRO, SEGUNDO, TERCEIRO, OUTRO");
+            System.out.println("Opções de Posição: PRIMEIRO, SEGUNDO ou TERCEIRO");
             System.out.print("Digite a Nova Posição: ");
             String posicaoStr = scanner.nextLine().toUpperCase();
             Posicao posicao = Posicao.valueOf(posicaoStr);

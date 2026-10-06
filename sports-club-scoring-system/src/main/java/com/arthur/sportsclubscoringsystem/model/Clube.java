@@ -29,6 +29,6 @@ public class Clube {
     private Double pontuacaoTotal = 0.0;
 
 
-    @OneToMany
+    @OneToMany(mappedBy = "clube")
     private List<Participacao> participacoes = new ArrayList<>();
 }

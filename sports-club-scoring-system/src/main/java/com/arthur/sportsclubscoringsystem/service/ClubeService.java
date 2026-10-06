@@ -81,7 +81,17 @@ public class ClubeService {
         if (clubeExistente == null) {
             throw new IllegalArgumentException("Clube não existe.");
         }
+        if (dto.getDono() == null || dto.getDono().isBlank()) {
+            throw new IllegalArgumentException("O nome do dono é obrigatório.");
+        }
 
+        if (dto.getDataFundacao() == null || dto.getDataFundacao().isAfter(LocalDate.now())) {
+            throw new IllegalArgumentException("Data inválida.");
+        }
+
+        if (dto.getNome() == null || dto.getNome().isBlank()) {
+            throw new IllegalArgumentException("O nome do clube é obrigatório.");
+        }
         clubeExistente.setNome(dto.getNome());
         clubeExistente.setDono(dto.getDono());
         clubeExistente.setDataFundacao(dto.getDataFundacao());
@@ -114,7 +124,12 @@ public class ClubeService {
         }
 
         List<Participacao> participacaos = clubeExistente.getParticipacoes();
-        participacaos.add(participacao);
+        boolean existe = participacaos.stream()
+                .anyMatch(p -> p.getId().equals(participacao.getId()));
+
+        if (!existe) {
+            participacaos.add(participacao);
+        }
 
         clubeExistente.setParticipacoes(participacaos);
         clubeExistente.setPontuacaoTotal(clubeExistente.getPontuacaoTotal() + pontos);

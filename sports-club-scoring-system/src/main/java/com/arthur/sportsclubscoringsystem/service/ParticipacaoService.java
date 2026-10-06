@@ -35,6 +35,10 @@ public class ParticipacaoService {
         return posicao.getPontosBase() * campeonato.getNivel().getMultiplicador();
     }
 
+    public Double pontosCampService(Campeonato antigo, Posicao posicao) {
+        return posicao.getPontosBase() * antigo.getNivel().getMultiplicador();
+    }
+
     public void atualizarClubePtsHist(Long id, Double pontos, Participacao participacao) {
         ClubeService clubeService = new ClubeService(clubeRepository);
         clubeService.atualizarPontosEResultados(id, pontos, participacao);
@@ -48,6 +52,9 @@ public class ParticipacaoService {
         if (dto.getIdCampeonato() == null) {
             throw new IllegalArgumentException("ID Campeonato inválida.");
         }
+        if (clubeRepository.buscarPorId(dto.getIdClube()).getDataFundacao().isAfter(campeonatoRepository.buscarPorId(dto.getIdCampeonato()).getDataInicio())) {
+            throw new IllegalArgumentException("O clube não existia na data de ínicio do torneio.");
+        }
         if (dto.getIdClube() == null) {
             throw new IllegalArgumentException("ID Clube inválida.");
         }
@@ -60,6 +67,13 @@ public class ParticipacaoService {
             throw new IllegalArgumentException("ID Campeonato inválida.");
         }
         List<Participacao> resultados = campeonato.getResultados();
+        for (int i = 0 ; i < resultados.toArray().length ; i++) {
+            if(dto.getPosicao() == Posicao.PRIMEIRO || dto.getPosicao() == Posicao.SEGUNDO || dto.getPosicao() == Posicao.TERCEIRO) {
+                if (resultados.get(i).getPosicao() == dto.getPosicao()) {
+                    throw new IllegalArgumentException("Já existe um clube nesse lugar do pódio.");
+                }
+            }
+        }
 
         Clube clube = clubeRepository.buscarPorId(dto.getIdClube());
         if (clube == null) {
@@ -67,7 +81,7 @@ public class ParticipacaoService {
         }
         if (dto.getPosicao() == Posicao.PRIMEIRO || dto.getPosicao() == Posicao.SEGUNDO || dto.getPosicao() == Posicao.TERCEIRO) {
             if (participacaoRepository.buscarPorClubeECampeonato(dto.getIdClube(), dto.getIdCampeonato()) != null) {
-                throw new IllegalArgumentException("Já existe essa posição no pódio desse campeonato.");
+                throw new IllegalArgumentException("Esse clube já foi registrado nesse campeonato.");
             }
         }
 
@@ -124,6 +138,10 @@ public class ParticipacaoService {
             throw new IllegalArgumentException("ID Inválido.");
         }
 
+        Clube clubeAntigo = participacaoExistente.getClube();
+        Campeonato campeonatoAntigo = participacaoExistente.getCampeonato();
+        Posicao posicaoAntiga = participacaoExistente.getPosicao();
+
         if (dto.getIdCampeonato() == null) {
             throw new IllegalArgumentException("ID Campeonato inválida.");
         }
@@ -138,23 +156,29 @@ public class ParticipacaoService {
         if (campeonato == null) {
             throw new IllegalArgumentException("ID Campeonato inválida.");
         }
-
+        List<Participacao> resultados = campeonato.getResultados();
+        for (int i = 0 ; i < resultados.toArray().length ; i++) {
+            if(dto.getPosicao() == Posicao.PRIMEIRO || dto.getPosicao() == Posicao.SEGUNDO || dto.getPosicao() == Posicao.TERCEIRO) {
+                if (resultados.get(i).getPosicao() == dto.getPosicao() && !resultados.get(i).getId().equals(id)) {
+                    throw new IllegalArgumentException("Já existe um clube nesse lugar do pódio.");
+                }
+            }
+        }
         Clube clube = clubeRepository.buscarPorId(dto.getIdClube());
         if (clube == null) {
             throw new IllegalArgumentException("ID Clube inválido.");
         }
 
-        clube.setPontuacaoTotal(clube.getPontuacaoTotal() - pontos(participacaoExistente
-                .getCampeonato()
-                .getId(), participacaoExistente.getPosicao()));
-        List<Participacao> participacoes = clube.getParticipacoes();
-        participacoes.remove(participacaoExistente);
-        clube.setParticipacoes(participacoes);
-        clubeRepository.atualizar(clube);
-        List<Participacao> resultados = campeonato.getResultados();
-        resultados.remove(participacaoExistente);
-        campeonato.setResultados(resultados);
-        campeonatoRepository.atualizar(campeonato);
+        clubeAntigo.setPontuacaoTotal(
+                clubeAntigo.getPontuacaoTotal()
+                        - pontos(campeonatoAntigo.getId(), posicaoAntiga)
+        );
+        List<Participacao> participacoes = clubeAntigo.getParticipacoes();
+        participacoes.removeIf(
+                p -> p.getId().equals(participacaoExistente.getId())
+        );
+        clubeAntigo.setParticipacoes(participacoes);
+        clubeRepository.atualizar(clubeAntigo);
 
         participacaoExistente.setPosicao(dto.getPosicao());
         participacaoExistente.setCampeonato(campeonatoRepository.buscarPorId(dto.getIdCampeonato()));
@@ -162,6 +186,56 @@ public class ParticipacaoService {
 
         resultados.add(participacaoExistente);
         atualizarCampeonatoRst(dto.getIdCampeonato(), resultados);
+        atualizarClubePtsHist(dto.getIdClube(), pontos(dto.getIdCampeonato(), dto.getPosicao()), participacaoExistente);
+
+        return new ParticipacaoResponseDTO(
+                participacaoExistente.getId(),
+                participacaoExistente.getClube().getNome(),
+                participacaoExistente.getCampeonato().getNome(),
+                participacaoExistente.getPosicao()
+        );
+    }
+
+    public ParticipacaoResponseDTO atualizarCampService(Long id, ParticipacaoRequestDTO dto, Campeonato antigo) {
+        Participacao participacaoExistente = participacaoRepository.buscarPorId(id);
+
+        if (participacaoExistente == null) {
+            throw new IllegalArgumentException("ID Inválido.");
+        }
+
+        if (dto.getIdCampeonato() == null) {
+            throw new IllegalArgumentException("ID Campeonato inválida.");
+        }
+        if (dto.getIdClube() == null) {
+            throw new IllegalArgumentException("ID Clube inválida.");
+        }
+        if(dto.getPosicao() == null) {
+            throw new IllegalArgumentException("Posição inválida.");
+        }
+
+        Campeonato campeonato = antigo;
+        if (campeonato == null) {
+            throw new IllegalArgumentException("ID Campeonato inválida.");
+        }
+
+        Clube clube = clubeRepository.buscarPorId(dto.getIdClube());
+        if (clube == null) {
+            throw new IllegalArgumentException("ID Clube inválido.");
+        }
+
+        clube.setPontuacaoTotal(clube.getPontuacaoTotal() - pontosCampService(
+                antigo,
+                participacaoExistente.getPosicao()
+        ));
+        List<Participacao> participacoes = clube.getParticipacoes();
+        participacoes.remove(participacaoExistente);
+        clube.setParticipacoes(participacoes);
+        clubeRepository.atualizar(clube);
+
+        participacaoExistente.setPosicao(dto.getPosicao());
+        participacaoExistente.setCampeonato(campeonatoRepository.buscarPorId(dto.getIdCampeonato()));
+        participacaoExistente.setClube(clubeRepository.buscarPorId(dto.getIdClube()));
+        participacaoRepository.atualizar(participacaoExistente);
         atualizarClubePtsHist(dto.getIdClube(), pontos(dto.getIdCampeonato(), dto.getPosicao()), participacaoExistente);
 
         return new ParticipacaoResponseDTO(

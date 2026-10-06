@@ -112,25 +112,42 @@ public class CampeonatoService {
         if (campeonatoExistente == null) {
             throw new IllegalArgumentException("Não existe esse campeonato.");
         }
+        if (dto.getNome() == null || dto.getNome().isBlank()) {
+            throw new IllegalArgumentException("O nome do campeonato é obrigatório.");
+        }
 
+        if (dto.getNivel() == null)  {
+            throw new IllegalArgumentException("O nível do campeonato é obrigatório.");
+        }
+
+        if (dto.getDataInicio() == null || dto.getDataFim() == null) {
+            throw new IllegalArgumentException("Data inválida.");
+        } else if (dto.getDataInicio().isAfter(dto.getDataFim())) {
+            throw new IllegalArgumentException("Data inválida.");
+        }
+
+        Campeonato campeonatoAntigo = new Campeonato();
+        campeonatoAntigo.setId(campeonatoExistente.getId());
+        campeonatoAntigo.setNome(campeonatoExistente.getNome());
+        campeonatoAntigo.setNivel(campeonatoExistente.getNivel());
+        campeonatoAntigo.setDataInicio(campeonatoExistente.getDataInicio());
+        campeonatoAntigo.setDataFim(campeonatoExistente.getDataFim());
+        campeonatoAntigo.setResultados(new ArrayList<>(campeonatoExistente.getResultados()));
         campeonatoExistente.setNome(dto.getNome());
         campeonatoExistente.setDataInicio(dto.getDataInicio());
         campeonatoExistente.setDataFim(dto.getDataFim());
-        if (dto.getResultados() != null) {
-            campeonatoExistente.setResultados(TransformarResponseClube(dto));
-        }
         campeonatoExistente.setNivel(dto.getNivel());
         campeonatoRepository.atualizar(campeonatoExistente);
 
         ParticipacaoService participacaoService = new ParticipacaoService(participacaoRepository, campeonatoRepository, clubeRepository);
         List<Participacao> participacaos = new ArrayList<>(campeonatoExistente.getResultados());
-        for (Participacao participacao : participacaos) {
-            participacao.setCampeonato(campeonatoExistente);
-            participacaoService.atualizar(participacao.getId(), new ParticipacaoRequestDTO(
-                    participacao.getClube().getId(),
+        for (int i = 0 ; i < participacaos.toArray().length ; i++) {
+            participacaos.get(i).setCampeonato(campeonatoExistente);
+            participacaoService.atualizarCampService(participacaos.get(i).getId(), new ParticipacaoRequestDTO(
+                    participacaos.get(i).getClube().getId(),
                     campeonatoExistente.getId(),
-                    participacao.getPosicao()
-            ));
+                    participacaos.get(i).getPosicao()
+            ), campeonatoAntigo);
         }
         return new CampeonatoResponseDTO(
                 campeonatoExistente.getId(),

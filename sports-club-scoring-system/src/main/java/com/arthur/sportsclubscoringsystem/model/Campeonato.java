@@ -30,6 +30,6 @@ public class Campeonato {
     @Enumerated(EnumType.STRING)
     private Nivel nivel;
 
-    @OneToMany
+    @OneToMany(mappedBy = "campeonato")
     private List<Participacao> resultados = new ArrayList<>();
 }
