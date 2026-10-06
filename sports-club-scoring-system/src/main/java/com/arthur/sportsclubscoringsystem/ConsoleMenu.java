@@ -35,15 +35,19 @@ public class ConsoleMenu implements CommandLineRunner {
         boolean rodando = true;
 
         while (rodando) {
-            System.out.println("\n=========================================");
             System.out.println("      SISTEMA DE PONTUAÇÃO ESPORTIVA     ");
-            System.out.println("=========================================");
             System.out.println("1. Cadastrar Clube");
             System.out.println("2. Listar Clubes");
-            System.out.println("3. Cadastrar Campeonato");
-            System.out.println("4. Listar Campeonatos");
-            System.out.println("5. Registrar Participação / Pontuação");
-            System.out.println("6. Listar Participações");
+            System.out.println("3. Editar Clube");
+            System.out.println("4. Excluir Clube");
+            System.out.println("5. Cadastrar Campeonato");
+            System.out.println("6. Listar Campeonatos");
+            System.out.println("7. Editar Campeonato");
+            System.out.println("8. Excluir Campeonato");
+            System.out.println("9. Registrar Participação / Pontuação");
+            System.out.println("10. Listar Participações");
+            System.out.println("11. Editar Participação");
+            System.out.println("12. Excluir Participação");
             System.out.println("0. Sair");
             System.out.print("Escolha uma opção: ");
 
@@ -52,10 +56,16 @@ public class ConsoleMenu implements CommandLineRunner {
             switch (opcao) {
                 case "1" -> cadastrarClube(scanner);
                 case "2" -> listarClubes();
-                case "3" -> cadastrarCampeonato(scanner);
-                case "4" -> listarCampeonatos();
-                case "5" -> registrarParticipacao(scanner);
-                case "6" -> listarParticipacoes();
+                case "3" -> editarClube(scanner);
+                case "4" -> excluirClube(scanner);
+                case "5" -> cadastrarCampeonato(scanner);
+                case "6" -> listarCampeonatos();
+                case "7" -> editarCampeonato(scanner);
+                case "8" -> excluirCampeonato(scanner);
+                case "9" -> registrarParticipacao(scanner);
+                case "10" -> listarParticipacoes();
+                case "11" -> editarParticipacao(scanner);
+                case "12" -> excluirParticipacao(scanner);
                 case "0" -> {
                     rodando = false;
                     System.out.println("\nSistema encerrado!");
@@ -65,6 +75,7 @@ public class ConsoleMenu implements CommandLineRunner {
         }
     }
 
+    // --- CLUBE ---
     private void cadastrarClube(Scanner scanner) {
         try {
             System.out.print("\nNome do Clube: ");
@@ -101,6 +112,48 @@ public class ConsoleMenu implements CommandLineRunner {
         }
     }
 
+    private void editarClube(Scanner scanner) {
+        try {
+            System.out.print("\nID do Clube a editar: ");
+            Long id = Long.parseLong(scanner.nextLine());
+
+            System.out.print("Novo Nome do Clube: ");
+            String nome = scanner.nextLine();
+
+            System.out.print("Novo Nome do Dono: ");
+            String dono = scanner.nextLine();
+
+            System.out.print("Nova Data de Fundação (dd/MM/yyyy): ");
+            String dataStr = scanner.nextLine();
+            LocalDate dataFundacao = LocalDate.parse(dataStr, dateFormatter);
+
+            ClubeRequestDTO dto = new ClubeRequestDTO();
+            dto.setNome(nome);
+            dto.setDono(dono);
+            dto.setDataFundacao(dataFundacao);
+
+            ClubeResponseDTO atualizado = clubeService.atualizar(id, dto);
+            System.out.println("-> Clube atualizado com sucesso! ID: " + atualizado.getId());
+
+        } catch (Exception e) {
+            System.out.println("Erro ao editar clube: " + e.getMessage());
+        }
+    }
+
+    private void excluirClube(Scanner scanner) {
+        try {
+            System.out.print("\nID do Clube a ser excluído: ");
+            Long id = Long.parseLong(scanner.nextLine());
+
+            clubeService.excluir(id);
+            System.out.println("-> Clube excluído com sucesso!");
+
+        } catch (Exception e) {
+            System.out.println("Erro ao excluir clube: " + e.getMessage());
+        }
+    }
+
+    // --- CAMPEONATO ---
     private void cadastrarCampeonato(Scanner scanner) {
         try {
             System.out.print("\nNome do Campeonato: ");
@@ -133,7 +186,7 @@ public class ConsoleMenu implements CommandLineRunner {
 
     private void listarCampeonatos() {
         System.out.println("\n--- LISTA DE CAMPEONATOS ---");
-        var lista = campeonatoService.buscarTodos(); // <--- Alterado para buscarTodos()
+        var lista = campeonatoService.buscarTodos();
         if (lista.isEmpty()) {
             System.out.println("Nenhum campeonato cadastrado.");
         } else {
@@ -142,6 +195,53 @@ public class ConsoleMenu implements CommandLineRunner {
         }
     }
 
+    private void editarCampeonato(Scanner scanner) {
+        try {
+            System.out.print("\nID do Campeonato a editar: ");
+            Long id = Long.parseLong(scanner.nextLine());
+
+            System.out.print("Novo Nome do Campeonato: ");
+            String nome = scanner.nextLine();
+
+            System.out.println("Opções de Nível: ESTADUAL, NACIONAL, INTERNACIONAL");
+            System.out.print("Digite o Novo Nível: ");
+            String nivelStr = scanner.nextLine().toUpperCase();
+            Nivel nivel = Nivel.valueOf(nivelStr);
+
+            System.out.print("Nova Data de Início (dd/MM/yyyy): ");
+            LocalDate dataInicio = LocalDate.parse(scanner.nextLine(), dateFormatter);
+
+            System.out.print("Nova Data de Fim (dd/MM/yyyy): ");
+            LocalDate dataFim = LocalDate.parse(scanner.nextLine(), dateFormatter);
+
+            CampeonatoRequestDTO dto = new CampeonatoRequestDTO();
+            dto.setNome(nome);
+            dto.setNivel(nivel);
+            dto.setDataInicio(dataInicio);
+            dto.setDataFim(dataFim);
+
+            CampeonatoResponseDTO atualizado = campeonatoService.atualizar(id, dto);
+            System.out.println("-> Campeonato atualizado com sucesso! ID: " + atualizado.getId());
+
+        } catch (Exception e) {
+            System.out.println("Erro ao editar campeonato: " + e.getMessage());
+        }
+    }
+
+    private void excluirCampeonato(Scanner scanner) {
+        try {
+            System.out.print("\nID do Campeonato a ser excluído: ");
+            Long id = Long.parseLong(scanner.nextLine());
+
+            campeonatoService.excluir(id);
+            System.out.println("-> Campeonato excluído com sucesso!");
+
+        } catch (Exception e) {
+            System.out.println("Erro ao excluir campeonato: " + e.getMessage());
+        }
+    }
+
+    // --- PARTICIPAÇÃO ---
     private void registrarParticipacao(Scanner scanner) {
         try {
             System.out.print("\nID do Clube: ");
@@ -179,6 +279,51 @@ public class ConsoleMenu implements CommandLineRunner {
         } else {
             lista.forEach(p -> System.out.printf("ID: %d | Clube: %s | Campeonato: %s | Posição: %s%n",
                     p.getId(), p.getNomeClube(), p.getNomeCampeonato(), p.getPosicao()));
+        }
+    }
+
+    private void editarParticipacao(Scanner scanner) {
+        try {
+            System.out.print("\nID da Participação a editar: ");
+            Long id = Long.parseLong(scanner.nextLine());
+
+            System.out.print("Novo ID do Clube: ");
+            Long clubeId = Long.parseLong(scanner.nextLine());
+
+            System.out.print("Novo ID do Campeonato: ");
+            Long campeonatoId = Long.parseLong(scanner.nextLine());
+
+            System.out.println("Opções de Posição: PRIMEIRO, SEGUNDO, TERCEIRO, OUTRO");
+            System.out.print("Digite a Nova Posição: ");
+            String posicaoStr = scanner.nextLine().toUpperCase();
+            Posicao posicao = Posicao.valueOf(posicaoStr);
+
+            ParticipacaoRequestDTO dto = new ParticipacaoRequestDTO();
+            dto.setIdClube(clubeId);
+            dto.setIdCampeonato(campeonatoId);
+            dto.setPosicao(posicao);
+
+            ParticipacaoResponseDTO atualizada = participacaoService.atualizar(id, dto);
+
+            System.out.println("-> Participação atualizada com sucesso!");
+            System.out.printf("   [ID: %d] Clube: %s | Campeonato: %s | Posição: %s%n",
+                    atualizada.getId(), atualizada.getNomeClube(), atualizada.getNomeCampeonato(), atualizada.getPosicao());
+
+        } catch (Exception e) {
+            System.out.println("Erro ao editar participação: " + e.getMessage());
+        }
+    }
+
+    private void excluirParticipacao(Scanner scanner) {
+        try {
+            System.out.print("\nID da Participação a ser excluída: ");
+            Long id = Long.parseLong(scanner.nextLine());
+
+            participacaoService.excluir(id);
+            System.out.println("-> Participação excluída com sucesso!");
+
+        } catch (Exception e) {
+            System.out.println("Erro ao excluir participação: " + e.getMessage());
         }
     }
 }
