@@ -35,37 +35,19 @@ public class ConsoleMenu implements CommandLineRunner {
         boolean rodando = true;
 
         while (rodando) {
-            System.out.println("      SISTEMA DE PONTUAÇÃO ESPORTIVA     ");
-            System.out.println("1. Cadastrar Clube");
-            System.out.println("2. Listar Clubes");
-            System.out.println("3. Editar Clube");
-            System.out.println("4. Excluir Clube");
-            System.out.println("5. Cadastrar Campeonato");
-            System.out.println("6. Listar Campeonatos");
-            System.out.println("7. Editar Campeonato");
-            System.out.println("8. Excluir Campeonato");
-            System.out.println("9. Registrar Participação / Pontuação");
-            System.out.println("10. Listar Participações");
-            System.out.println("11. Editar Participação");
-            System.out.println("12. Excluir Participação");
+            System.out.println("\n===== SISTEMA DE PONTUAÇÃO ESPORTIVA =====");
+            System.out.println("1. Menu de Clubes");
+            System.out.println("2. Menu de Campeonatos");
+            System.out.println("3. Menu de Participações");
             System.out.println("0. Sair");
             System.out.print("Escolha uma opção: ");
 
             String opcao = scanner.nextLine();
 
             switch (opcao) {
-                case "1" -> cadastrarClube(scanner);
-                case "2" -> listarClubes();
-                case "3" -> editarClube(scanner);
-                case "4" -> excluirClube(scanner);
-                case "5" -> cadastrarCampeonato(scanner);
-                case "6" -> listarCampeonatos();
-                case "7" -> editarCampeonato(scanner);
-                case "8" -> excluirCampeonato(scanner);
-                case "9" -> registrarParticipacao(scanner);
-                case "10" -> listarParticipacoes();
-                case "11" -> editarParticipacao(scanner);
-                case "12" -> excluirParticipacao(scanner);
+                case "1" -> menuClubes(scanner);
+                case "2" -> menuCampeonatos(scanner);
+                case "3" -> menuParticipacoes(scanner);
                 case "0" -> {
                     rodando = false;
                     System.out.println("\nSistema encerrado!");
@@ -75,7 +57,80 @@ public class ConsoleMenu implements CommandLineRunner {
         }
     }
 
-    // --- CLUBE ---
+    // --- SUBMENUS ---
+    private void menuClubes(Scanner scanner) {
+        boolean voltar = false;
+        while (!voltar) {
+            System.out.println("\n--- GERENCIAR CLUBES ---");
+            System.out.println("1. Cadastrar Clube");
+            System.out.println("2. Listar Clubes");
+            System.out.println("3. Editar Clube");
+            System.out.println("4. Excluir Clube");
+            System.out.println("0. Voltar ao Menu Principal");
+            System.out.print("Escolha uma opção: ");
+
+            String opcao = scanner.nextLine();
+
+            switch (opcao) {
+                case "1" -> cadastrarClube(scanner);
+                case "2" -> listarClubes();
+                case "3" -> editarClube(scanner);
+                case "4" -> excluirClube(scanner);
+                case "0" -> voltar = true;
+                default -> System.out.println("Opção inválida!");
+            }
+        }
+    }
+
+    private void menuCampeonatos(Scanner scanner) {
+        boolean voltar = false;
+        while (!voltar) {
+            System.out.println("\n--- GERENCIAR CAMPEONATOS ---");
+            System.out.println("1. Cadastrar Campeonato");
+            System.out.println("2. Listar Campeonatos");
+            System.out.println("3. Editar Campeonato");
+            System.out.println("4. Excluir Campeonato");
+            System.out.println("0. Voltar ao Menu Principal");
+            System.out.print("Escolha uma opção: ");
+
+            String opcao = scanner.nextLine();
+
+            switch (opcao) {
+                case "1" -> cadastrarCampeonato(scanner);
+                case "2" -> listarCampeonatos();
+                case "3" -> editarCampeonato(scanner);
+                case "4" -> excluirCampeonato(scanner);
+                case "0" -> voltar = true;
+                default -> System.out.println("Opção inválida!");
+            }
+        }
+    }
+
+    private void menuParticipacoes(Scanner scanner) {
+        boolean voltar = false;
+        while (!voltar) {
+            System.out.println("\n--- GERENCIAR PARTICIPAÇÕES ---");
+            System.out.println("1. Registrar Participação / Pontuação");
+            System.out.println("2. Listar Participações");
+            System.out.println("3. Editar Participação");
+            System.out.println("4. Excluir Participação");
+            System.out.println("0. Voltar ao Menu Principal");
+            System.out.print("Escolha uma opção: ");
+
+            String opcao = scanner.nextLine();
+
+            switch (opcao) {
+                case "1" -> registrarParticipacao(scanner);
+                case "2" -> listarParticipacoes();
+                case "3" -> editarParticipacao(scanner);
+                case "4" -> excluirParticipacao(scanner);
+                case "0" -> voltar = true;
+                default -> System.out.println("Opção inválida!");
+            }
+        }
+    }
+
+    // --- OPERAÇÕES DE CLUBE ---
     private void cadastrarClube(Scanner scanner) {
         try {
             System.out.print("\nNome do Clube: ");
@@ -153,7 +208,7 @@ public class ConsoleMenu implements CommandLineRunner {
         }
     }
 
-    // --- CAMPEONATO ---
+    // --- OPERAÇÕES DE CAMPEONATO ---
     private void cadastrarCampeonato(Scanner scanner) {
         try {
             System.out.print("\nNome do Campeonato: ");
@@ -241,7 +296,7 @@ public class ConsoleMenu implements CommandLineRunner {
         }
     }
 
-    // --- PARTICIPAÇÃO ---
+    // --- OPERAÇÕES DE PARTICIPAÇÃO ---
     private void registrarParticipacao(Scanner scanner) {
         try {
             System.out.print("\nID do Clube: ");
